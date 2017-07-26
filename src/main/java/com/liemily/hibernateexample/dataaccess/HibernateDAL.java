@@ -49,30 +49,54 @@ public class HibernateDAL {
     }
 
     @Transactional
-    public void execute(String query) {
+    public void execute(String query) throws InterruptedException {
         try (Session session = sessionFactory.getCurrentSession()) {
             session.beginTransaction();
             session.createQuery(query).executeUpdate();
             session.getTransaction().commit();
+        } catch (HibernateException e) {
+            if (e.getMessage().contains("no connection is currently available")) {
+                waitForConnection();
+            } else {
+                throw e;
+            }
         }
     }
 
     @Transactional
-    public void save(Object object) {
+    public void save(Object object) throws InterruptedException {
         try (Session session = sessionFactory.getCurrentSession()) {
             session.beginTransaction();
             session.save(object);
             session.getTransaction().commit();
+        } catch (HibernateException e) {
+            if (e.getMessage().contains("no connection is currently available")) {
+                waitForConnection();
+            } else {
+                throw e;
+            }
         }
     }
 
     @Transactional
-    public void delete(String entity, String id) {
+    public void delete(String entity, String id) throws InterruptedException {
         try (Session session = sessionFactory.getCurrentSession()) {
             session.beginTransaction();
             Object objectToDelete = session.load(entity, id);
             session.delete(objectToDelete);
             session.getTransaction().commit();
+        } catch (HibernateException e) {
+            if (e.getMessage().contains("no connection is currently available")) {
+                waitForConnection();
+            } else {
+                throw e;
+            }
         }
+    }
+
+    protected void waitForConnection() throws InterruptedException {
+        final long WAIT_MS = 250;
+        logger.warn("No connection available in the connection pool. Sleeping " + WAIT_MS + "ms");
+        Thread.sleep(WAIT_MS);
     }
 }

@@ -40,7 +40,7 @@ public class StockServiceTest {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
         try {
             stockService.delete(stockSymbol);
         } catch (EntityNotFoundException e) {
@@ -69,7 +69,7 @@ public class StockServiceTest {
     }
 
     @Test
-    public void testWriteSingleStockAvgTime() {
+    public void testWriteSingleStockAvgTime() throws Exception {
         Set<Stock> stocks = generateStocks(AVG_RUN_COUNT);
         Set<String> stockSymbols = new HashSet<>();
         stocks.forEach(stock -> stockSymbols.add(stock.getSymbol()));
@@ -83,7 +83,7 @@ public class StockServiceTest {
     }
 
     @Test
-    public void testWriteMultipleStocksAvgTime() {
+    public void testWriteMultipleStocksAvgTime() throws Exception {
         Set<Stock> stocks = generateStocks(AVG_RUN_COUNT);
         Set<String> stockSymbols = new HashSet<>();
         stocks.forEach(stock -> stockSymbols.add(stock.getSymbol()));
@@ -185,7 +185,7 @@ public class StockServiceTest {
         return stocks;
     }
 
-    long timeWriteStocks(Set<Stock> stocks, int batchCount) {
+    long timeWriteStocks(Set<Stock> stocks, int batchCount) throws Exception {
         long totalTimeMs = 0;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < stocks.size(); i += batchCount) {

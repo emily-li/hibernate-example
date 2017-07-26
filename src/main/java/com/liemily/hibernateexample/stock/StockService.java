@@ -20,13 +20,15 @@ public class StockService {
         this.hibernateDAL = hibernateDAL;
     }
 
-    public boolean save(Stock stock) {
+    public boolean save(Stock stock) throws InterruptedException {
         hibernateDAL.save(stock);
         return true;
     }
 
-    public void save(Set<Stock> stocks) {
-        stocks.forEach(stock -> save(stock));
+    public void save(Set<Stock> stocks) throws InterruptedException {
+        for (Stock stock : stocks) {
+            save(stock);
+        }
     }
 
     public Stock findOne(String stockSymbol) throws InterruptedException {
@@ -39,11 +41,11 @@ public class StockService {
         return stock == null ? new ArrayList<>() : stock;
     }
 
-    public void delete(String stockSymbol) {
+    public void delete(String stockSymbol) throws InterruptedException {
         hibernateDAL.delete("com.liemily.hibernateexample.stock.Stock", stockSymbol);
     }
 
-    public void delete(Set<String> stockSymbols) {
+    public void delete(Set<String> stockSymbols) throws InterruptedException {
         final String DELIM = ", ";
         StringBuilder query = new StringBuilder("DELETE FROM Stock WHERE symbol IN (");
         stockSymbols.forEach(symbol -> query.append("'").append(symbol).append("'").append(DELIM));
